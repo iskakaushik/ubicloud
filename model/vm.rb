@@ -328,7 +328,27 @@ class Vm < Sequel::Model
         "num_queues" => s.num_queues,
         "queue_size" => s.queue_size,
         "copy_on_read" => false
-      }.tap { |v| v["cpus"] = cpus if add_cpus }
+      }.tap { |v|
+        v["cpus"] = cpus if add_cpus
+
+        if umi && s.vhost_block_backend_version
+          v["stripe_source"] = {
+            "source" => "archive",
+            "type" => "s3",
+            "bucket" => Config.storage_archive_bucket,
+            "prefix" => inhost_name,
+            "endpoint" => Config.storage_archive_endpoint,
+            "region" => "auto",
+            "credentials" => {
+              "access_key_id" => Config.storage_archive_access_key,
+              "secret_access_key" => Config.storage_archive_secret_key
+            }
+          }
+          # If we are restoring from archive, we want copy_on_read to be true
+          # to lazily fetch data.
+          v["copy_on_read"] = true
+        end
+      }
     }
   end
 
@@ -386,6 +406,7 @@ end
 #  cpu_percent_limit       | integer                  |
 #  cpu_burst_percent_limit | integer                  |
 #  location_id             | uuid                     | NOT NULL
+#  umi                     | boolean                  | NOT NULL DEFAULT false
 # Indexes:
 #  vm_pkey                             | PRIMARY KEY btree (id)
 #  vm_ephemeral_net6_key               | UNIQUE btree (ephemeral_net6)
