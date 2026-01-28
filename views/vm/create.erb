@@ -34,6 +34,7 @@ current_usage = @project.current_resource_usage("VmVCpu")
 
   elements = [
     {name: "size", type: "radio_small_cards", label: "Server size", required: "required", content_generator: ContentGenerator::Vm.method(:size)},
+    {name: "umi", type: "checkbox", label: "UMI Creation", description: "Enable if this VM will be used for creating a Ubicloud Machine Image (UMI). Storage will be limited to 5GB or 10GB.", content_generator: ContentGenerator::Vm.method(:umi)},
     {name: "storage_size", type: "radio_small_cards", label: "Storage size", required: "required", content_generator: ContentGenerator::Vm.method(:storage_size)}
   ]
 

@@ -67,6 +67,31 @@ class Clover
           r.redirect vm, "/settings"
         end
       end
+
+      r.post "create-umi" do
+        authorize("Vm:edit", vm)
+
+        unless vm.display_state == "running"
+          if api?
+            fail Validation::ValidationFailed.new({vm: "VM must be in running state to create UMI"})
+          else
+            flash["error"] = "VM must be in running state to create UMI"
+            r.redirect vm, "/settings"
+          end
+        end
+
+        DB.transaction do
+          Prog::Storage::ArchiveVm.assemble(vm.id)
+          audit_log(vm, "create_umi")
+        end
+
+        if api?
+          Serializers::Vm.serialize(vm, {detailed: true})
+        else
+          flash["notice"] = "UMI creation started. The VM will be stopped and archived."
+          r.redirect vm, "/settings"
+        end
+      end
     end
   end
 end

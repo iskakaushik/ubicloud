@@ -12,7 +12,7 @@ class Prog::Vm::Nexus < Prog::Base
     distinct_storage_devices: false, force_host_id: nil, exclude_host_ids: [], gpu_count: 0, gpu_device: nil,
     hugepages: true, hypervisor: nil, ch_version: nil, firmware_version: nil, new_private_subnet_name: nil,
     exclude_availability_zones: [], availability_zone: nil, alternative_families: [],
-    allow_private_subnet_in_other_project: false, init_script: nil, exclude_data_centers: [])
+    allow_private_subnet_in_other_project: false, init_script: nil, exclude_data_centers: [], umi: false)
 
     unless (project = Project[project_id])
       fail "No existing project"
@@ -102,7 +102,8 @@ class Prog::Vm::Nexus < Prog::Base
         ip4_enabled: enable_ip4,
         pool_id:,
         arch:,
-        project_id:
+        project_id:,
+        umi:
       ) { it.id = ubid.to_uuid }
       nic.update(vm_id: vm.id)
 

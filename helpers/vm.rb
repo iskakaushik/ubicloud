@@ -36,6 +36,7 @@ class Clover
       tp.nonempty_str(["size", "unix_user", "boot_image", "private_subnet_id", "gpu", "init_script"])
       tp.pos_int("storage_size")
       tp.bool("enable_ip4")
+      tp.bool("umi")
     end
     assemble_params.compact!
 
@@ -184,9 +185,10 @@ class Clover
       vm_size.family == family
     end
 
-    options.add_option(name: "storage_size", values: ["10", "20", "40", "80", "160", "320", "600", "640", "1200", "2400"], parent: "size") do |location, family, size, storage_size|
+    options.add_option(name: "umi", values: [false, true], parent: "size")
+    options.add_option(name: "storage_size", values: ["5", "10", "20", "40", "80", "160", "320", "600", "640", "1200", "2400"], parent: "umi") do |location, family, size, umi, storage_size|
       vm_size = Option::VmSizes.find { it.display_name == size && it.arch == "x64" }
-      vm_size.storage_size_options.include?(storage_size.to_i)
+      (umi ? [5, 10] : vm_size.storage_size_options).include?(storage_size.to_i)
     end
 
     if @show_gpu != false

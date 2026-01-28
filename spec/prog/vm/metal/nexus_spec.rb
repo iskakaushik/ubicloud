@@ -167,6 +167,11 @@ RSpec.describe Prog::Vm::Metal::Nexus do
           force_host_id: "some-vm-host-id", exclude_host_ids: ["some-vm-host-id"])
       }.to raise_error RuntimeError, "Cannot force and exclude the same host"
     end
+
+    it "sets umi flag on the vm" do
+      st = Prog::Vm::Nexus.assemble("some_ssh key", project.id, umi: true)
+      expect(st.subject.umi).to be true
+    end
   end
 
   describe ".assemble_with_sshable" do

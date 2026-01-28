@@ -367,5 +367,25 @@ RSpec.describe Clover, "vm" do
         expect(SemSnap.new(vm.id).set?("destroy")).to be false
       end
     end
+
+    describe "create-umi" do
+      it "success when vm is running" do
+        vm.update(display_state: "running")
+        expect(Prog::Storage::ArchiveVm).to receive(:assemble).with(vm.id)
+
+        post "/project/#{project.ubid}/location/#{vm.display_location}/vm/#{vm.name}/create-umi"
+
+        expect(last_response.status).to eq(200)
+        expect(JSON.parse(last_response.body)["name"]).to eq(vm.name)
+      end
+
+      it "fails when vm is not running" do
+        vm.update(display_state: "creating")
+
+        post "/project/#{project.ubid}/location/#{vm.display_location}/vm/#{vm.name}/create-umi"
+
+        expect(last_response).to have_api_error(400, "Validation failed for following fields: vm", {"vm" => "VM must be in running state to create UMI"})
+      end
+    end
   end
 end

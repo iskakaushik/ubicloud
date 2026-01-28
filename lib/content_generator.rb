@@ -40,7 +40,7 @@ module ContentGenerator
       ]
     end
 
-    def self.storage_size(location, family, vm_size, storage_size)
+    def self.storage_size(location, family, vm_size, umi, storage_size)
       storage_size = storage_size.to_i
       unit_price = BillingRate.unit_price_from_resource_properties("VmStorage", family, location.name)
 
@@ -68,6 +68,10 @@ module ContentGenerator
 
     def self.boot_image(boot_image)
       Option::BootImages.find { it.name == boot_image }.display_name
+    end
+
+    def self.umi(location, family, size, value)
+      "VM will be used for UMI creation"
     end
   end
 
